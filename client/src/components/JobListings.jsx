@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
 import JobListing from "./JobListing";
 import Spinner from "./Spinner";
+
 const JobListings = ({ isHome = false }) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchJobs = async () => {
+      // Use env variable for base URL
+      const baseUrl = import.meta.env.VITE_API_URL;
       const apiUrl = isHome
-        ? "/api/jobs?_limit=3"
-        : "/api/jobs";
+        ? `${baseUrl}/api/jobs?_limit=3`
+        : `${baseUrl}/api/jobs`;
+
       try {
         const res = await fetch(apiUrl);
         const data = await res.json();
@@ -20,8 +24,9 @@ const JobListings = ({ isHome = false }) => {
         setLoading(false);
       }
     };
+
     fetchJobs();
-  }, []);
+  }, [isHome]);
 
   return (
     <section className="bg-blue-50 px-4 py-10">
