@@ -137,8 +137,13 @@ return (
 );
 };
 export async function jobLoader({ params }) {
-  const res = await fetch(`/api/jobs/${params.id}`);
-  if (!res.ok) throw new Error("Failed to fetch job");
+  const baseUrl = import.meta.env.VITE_API_URL || "";
+  const res = await fetch(`${baseUrl}/api/jobs/${params.id}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch job");
+  }
+
   return res.json();
 }
 export {JobPage as default};
