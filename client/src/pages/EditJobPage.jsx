@@ -1,7 +1,8 @@
 import { useParams, useLoaderData, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
-const EditJobPage = ({ updateJobSubmit }) => {
+
+const EditJobPage = () => {
   const job = useLoaderData();
   const [title, setTitle] = useState(job.title);
   const [type, setType] = useState(job.type);
@@ -17,7 +18,8 @@ const EditJobPage = ({ updateJobSubmit }) => {
 
   const navigate = useNavigate();
   const { id } = useParams();
-  const submitForm = (e) => {
+
+  const submitForm = async (e) => {
     e.preventDefault();
 
     const updatedJob = {
@@ -34,11 +36,27 @@ const EditJobPage = ({ updateJobSubmit }) => {
         contactPhone,
       },
     };
-    updateJobSubmit(updatedJob);
 
-    toast.success("Job Updated successfully");
-    return navigate(`/jobs/${id}`);
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${baseUrl}/api/jobs/${id}`, {
+        method: "PUT", // 👈 use PATCH if your backend expects partial updates
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedJob),
+      });
+
+      if (!res.ok) throw new Error("Failed to update job");
+
+      toast.success("Job updated successfully 🚀");
+      navigate(`/jobs/${id}`);
+    } catch (error) {
+      console.error("Error updating job:", error);
+      toast.error("Error updating job ❌");
+    }
   };
+
   return (
     <section className="bg-indigo-50">
       <div className="container m-auto max-w-2xl py-24">
@@ -48,11 +66,9 @@ const EditJobPage = ({ updateJobSubmit }) => {
               Update Job
             </h2>
 
+            {/* Job Type */}
             <div className="mb-4">
-              <label
-                htmlFor="type"
-                className="block text-gray-700 font-bold mb-2"
-              >
+              <label htmlFor="type" className="block text-gray-700 font-bold mb-2">
                 Job Type
               </label>
               <select
@@ -70,6 +86,7 @@ const EditJobPage = ({ updateJobSubmit }) => {
               </select>
             </div>
 
+            {/* Job Title */}
             <div className="mb-4">
               <label className="block text-gray-700 font-bold mb-2">
                 Job Listing Name
@@ -85,11 +102,10 @@ const EditJobPage = ({ updateJobSubmit }) => {
                 required
               />
             </div>
+
+            {/* Description */}
             <div className="mb-4">
-              <label
-                htmlFor="description"
-                className="block text-gray-700 font-bold mb-2"
-              >
+              <label htmlFor="description" className="block text-gray-700 font-bold mb-2">
                 Description
               </label>
               <textarea
@@ -103,11 +119,9 @@ const EditJobPage = ({ updateJobSubmit }) => {
               ></textarea>
             </div>
 
+            {/* Salary */}
             <div className="mb-4">
-              <label
-                htmlFor="type"
-                className="block text-gray-700 font-bold mb-2"
-              >
+              <label htmlFor="salary" className="block text-gray-700 font-bold mb-2">
                 Salary
               </label>
               <select
@@ -132,6 +146,7 @@ const EditJobPage = ({ updateJobSubmit }) => {
               </select>
             </div>
 
+            {/* Location */}
             <div className="mb-4">
               <label className="block text-gray-700 font-bold mb-2">
                 Location
@@ -150,11 +165,9 @@ const EditJobPage = ({ updateJobSubmit }) => {
 
             <h3 className="text-2xl mb-5">Company Info</h3>
 
+            {/* Company Name */}
             <div className="mb-4">
-              <label
-                htmlFor="company"
-                className="block text-gray-700 font-bold mb-2"
-              >
+              <label htmlFor="company" className="block text-gray-700 font-bold mb-2">
                 Company Name
               </label>
               <input
@@ -168,6 +181,7 @@ const EditJobPage = ({ updateJobSubmit }) => {
               />
             </div>
 
+            {/* Company Description */}
             <div className="mb-4">
               <label
                 htmlFor="company_description"
@@ -186,11 +200,9 @@ const EditJobPage = ({ updateJobSubmit }) => {
               ></textarea>
             </div>
 
+            {/* Contact Email */}
             <div className="mb-4">
-              <label
-                htmlFor="contact_email"
-                className="block text-gray-700 font-bold mb-2"
-              >
+              <label htmlFor="contact_email" className="block text-gray-700 font-bold mb-2">
                 Contact Email
               </label>
               <input
@@ -198,17 +210,16 @@ const EditJobPage = ({ updateJobSubmit }) => {
                 id="contact_email"
                 name="contact_email"
                 className="border rounded w-full py-2 px-3"
-                placeholder="Email address htmlFor applicants"
+                placeholder="Email address for applicants"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
                 required
               />
             </div>
+
+            {/* Contact Phone */}
             <div className="mb-4">
-              <label
-                htmlFor="contact_phone"
-                className="block text-gray-700 font-bold mb-2"
-              >
+              <label htmlFor="contact_phone" className="block text-gray-700 font-bold mb-2">
                 Contact Phone
               </label>
               <input
@@ -216,12 +227,13 @@ const EditJobPage = ({ updateJobSubmit }) => {
                 id="contact_phone"
                 name="contact_phone"
                 className="border rounded w-full py-2 px-3"
-                placeholder="Optional phone htmlFor applicants"
+                placeholder="Optional phone for applicants"
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
               />
             </div>
 
+            {/* Submit */}
             <div>
               <button
                 className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"

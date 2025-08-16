@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-const AddJobPage = ({ addJobSubmit }) => {
+const AddJobPage = () => {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Full-Time");
   const [location, setLocation] = useState("");
@@ -13,27 +13,45 @@ const AddJobPage = ({ addJobSubmit }) => {
   const [contactPhone, setContactPhone] = useState("");
 
   const navigate = useNavigate();
-  const submitForm = (e) => {
-    e.preventDefault();
+  const submitForm = async (e) => {
+  e.preventDefault();
 
-    const newJob = {
-      title,
-      type,
-      location,
-      description,
-      salary,
-      company: {
-        name: companyName,
-        description: companyDescription,
-        contactEmail,
-        contactPhone,
-      },
-    };
-    addJobSubmit(newJob);
-
-    toast.success('Job Added successfully');
-    return navigate("/jobs");
+  const newJob = {
+    title,
+    type,
+    location,
+    description,
+    salary,
+    company: {
+      name: companyName,
+      description: companyDescription,
+      contactEmail,
+      contactPhone,
+    },
   };
+
+  try {
+    const baseUrl = import.meta.env.VITE_API_URL; // ✅ from .env.production
+    const res = await fetch(`${baseUrl}/api/jobs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newJob),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to add job");
+    }
+
+    toast.success("Job added successfully 🚀");
+    navigate("/jobs"); // ✅ redirect to jobs page
+  } catch (error) {
+    console.error("Error adding job:", error);
+    toast.error("Error adding job");
+  }
+};
+
   return (
     <>
       <section className="bg-indigo-50">
